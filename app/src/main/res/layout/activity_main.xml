@@ -6,7 +6,40 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- 名前入力 -->
+    <!-- ヘッダー（ログイン済みのとき表示） -->
+    <LinearLayout
+        android:id="@+id/headerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone"
+        android:gravity="center_vertical"
+        android:paddingBottom="8dp">
+
+        <Button
+            android:id="@+id/buttonBookmark"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="ブックマーク"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/buttonMessage"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="メッセージ"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:id="@+id/buttonNotification"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:text="通知"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+    <!-- 以下、既存の名前入力や掲示板ID入力、GOボタンなど -->
+
     <EditText
         android:id="@+id/editTextName"
         android:hint="名前"
@@ -16,7 +49,6 @@
         android:layout_height="wrap_content"
         android:text="ゲスト" />
 
-    <!-- 掲示板ID入力 -->
     <EditText
         android:id="@+id/editTextBoardId"
         android:hint="掲示板ID"
@@ -26,7 +58,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp" />
 
-    <!-- GOボタン -->
     <Button
         android:id="@+id/buttonGo"
         android:text="GO"
@@ -36,7 +67,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp" />
 
-    <!-- ログインボタン -->
     <Button
         android:id="@+id/buttonLogin"
         android:layout_width="wrap_content"
