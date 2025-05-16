@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="#1e1e1e"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 名前入力 -->
+    <EditText
+        android:id="@+id/editTextName"
+        android:hint="名前"
+        android:textColor="#000000"
+        android:background="@android:drawable/edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ゲスト" />
+
+    <!-- 掲示板ID入力 -->
+    <EditText
+        android:id="@+id/editTextBoardId"
+        android:hint="掲示板ID"
+        android:textColor="#000000"
+        android:background="@android:drawable/edit_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp" />
+
+    <!-- GOボタン -->
+    <Button
+        android:id="@+id/buttonGo"
+        android:text="GO"
+        android:background="#03DAC5"
+        android:textColor="#000000"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp" />
+
+    <!-- ログインボタン -->
+    <Button
+        android:id="@+id/buttonLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ログイン"
+        android:layout_marginTop="16dp" />
+</LinearLayout>
