@@ -19,8 +19,8 @@ class PostAdapter(context: Context, private val posts: MutableList<Post>) :
         val timeText = view.findViewById<TextView>(R.id.textTimestamp)
         val contentText = view.findViewById<TextView>(R.id.textContent)
 
-        nameText.text = post?.userName
-        timeText.text = post?.createdAt
+        nameText.text = post?.name
+        timeText.text = post?.timestamp
         contentText.text = post?.content
 
         return view
