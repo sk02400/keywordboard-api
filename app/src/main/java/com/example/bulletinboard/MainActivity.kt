@@ -6,26 +6,29 @@ import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import com.example.bulletinboard.UserSession
+import android.widget.EditText
+import android.widget.Toast
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var userSession: UserSession
     private lateinit var loginButton: Button  // ← 追加
     private lateinit var headerLayout: View   // ← 追加
+    private lateinit var buttonGo: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         userSession = UserSession(this)
+        buttonGo = findViewById(R.id.buttonGo)
+
         loginButton = findViewById(R.id.buttonLogin)
         headerLayout = findViewById(R.id.headerLayout)
-
-        val loginButton = findViewById<Button>(R.id.buttonLogin)
-        val headerLayout = findViewById<View>(R.id.headerLayout)
         val bookmarkButton = findViewById<Button>(R.id.buttonBookmark)
         val messageButton = findViewById<Button>(R.id.buttonMessage)
         val notificationButton = findViewById<Button>(R.id.buttonNotification)
+        val editTextBoardId = findViewById<EditText>(R.id.editTextBoardId)
 
         if (userSession.isLoggedIn()) {
             loginButton.visibility = View.GONE
@@ -33,6 +36,28 @@ class MainActivity : AppCompatActivity() {
         } else {
             loginButton.visibility = View.VISIBLE
             headerLayout.visibility = View.GONE
+        }
+
+
+        buttonGo.setOnClickListener {
+            val boardId = editTextBoardId.text.toString()
+            val userId = UserSession(this).getLogin()
+
+            if (boardId.isBlank()) {
+                Toast.makeText(this, "掲示板IDを入力してください", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+//            if (userId == null) {
+//                Toast.makeText(this, "ログイン情報が見つかりません", Toast.LENGTH_SHORT).show()
+//                return@setOnClickListener
+//            }
+
+            // BoardActivityへ遷移
+            val intent = Intent(this, BoardActivity::class.java)
+            intent.putExtra("BOARD_ID", boardId)
+            intent.putExtra("USER_ID", userId)
+            startActivity(intent)
         }
 
         loginButton.setOnClickListener {

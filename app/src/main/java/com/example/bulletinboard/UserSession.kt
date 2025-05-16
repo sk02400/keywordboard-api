@@ -19,6 +19,10 @@ class UserSession(context: Context) {
             .putString(KEY_USER_ID, userId)
             .apply()
     }
+    fun getLogin(): String? {
+        return prefs.getString(KEY_USER_ID, null)
+    }
+
     fun saveUserId(userId: String) {
         prefs.edit()
             .putString(KEY_USER_ID, userId)

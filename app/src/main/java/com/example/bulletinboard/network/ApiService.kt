@@ -1,37 +1,20 @@
+// ApiService.kt
 package com.example.bulletinboard.network
 
 import com.example.bulletinboard.model.Post
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
-import java.net.HttpURLConnection
-import java.net.URL
+import retrofit2.Response
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
 
-class ApiService {
-    private val serverUrl = "http://10.0.2.2:3000"
+interface ApiService {
+    @POST("login")
+    suspend fun login(@Body loginRequest: LoginRequest): Response<LoginResponse>
 
-    // Jsonのカスタム設定を作成（ignoreUnknownKeys と coerceInputValuesを追加）
-    private val json = Json {
-        ignoreUnknownKeys = true
-        coerceInputValues = true
-    }
+    @GET("posts/{boardId}")
+    suspend fun getPosts(@Path("boardId") boardId: String): Response<List<Post>>
 
-    fun getPosts(boardId: String): List<Post> {
-        val url = URL("$serverUrl/posts/$boardId")
-        val connection = url.openConnection() as HttpURLConnection
-        return connection.inputStream.bufferedReader().use {
-            json.decodeFromString(it.readText())  // ここでカスタムjsonを使う
-        }
-    }
-
-    fun createPost(boardId: String, post: Post) {
-        val url = URL("$serverUrl/posts/$boardId")
-        val connection = url.openConnection() as HttpURLConnection
-        connection.requestMethod = "POST"
-        connection.setRequestProperty("Content-Type", "application/json")
-        connection.doOutput = true
-        val jsonString = json.encodeToString(post)  // ここもカスタムjsonを使う
-        connection.outputStream.write(jsonString.toByteArray())
-        connection.inputStream.close()
-    }
+    @POST("boards/{boardId}/posts")
+    suspend fun createPost(@Path("boardId") boardId: String, @Body post: Post): Response<Unit>
 }
