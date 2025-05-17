@@ -1,6 +1,7 @@
 package com.example.bulletinboard
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.bulletinboard.model.Post
@@ -17,7 +18,7 @@ class BoardActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_board)
 
-        val name = intent.getStringExtra("USER_ID") ?: "匿名"
+        val userId = intent.getStringExtra("USER_ID") ?: "匿名"
         val boardId = intent.getStringExtra("BOARD_ID") ?: "default"
 
         val postInput = findViewById<EditText>(R.id.editTextPost)
@@ -44,6 +45,27 @@ class BoardActivity : AppCompatActivity() {
             }
         }
 
+        fun updateBookmarkIcon() {
+            bookmarkButton.setImageResource(
+                if (isBookmarked) R.drawable.ic_heart_filled else R.drawable.ic_heart_border
+            )
+        }
+
+        suspend fun checkBookmarkStatus() {
+            try {
+                val response = api.getBookmarkStatus(userId, boardId)
+                if (response.isSuccessful) {
+                    isBookmarked = response.body()?.bookmarked ?: false
+                    Log.d("BookmarkCheck", "Bookmarked = $isBookmarked")
+                } else {
+                    Log.e("BookmarkCheck", "Failed: ${response.code()}, errorBody: ${response.errorBody()?.string()}")
+                }
+            } catch (e: Exception) {
+                Log.e("BookmarkCheck", "Exception occurred", e)
+            }
+        }
+
+
         postButton.setOnClickListener {
             val content = postInput.text.toString()
             if (content.isBlank()) {
@@ -52,7 +74,7 @@ class BoardActivity : AppCompatActivity() {
             }
 
             val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
-            val post = Post(name = name, content = content, timestamp = timestamp)
+            val post = Post(name = userId, content = content, timestamp = timestamp)
 
             CoroutineScope(Dispatchers.IO).launch {
                 try {
@@ -74,22 +96,47 @@ class BoardActivity : AppCompatActivity() {
             }
         }
 
-        // ❤️ ブックマークボタンの処理
         bookmarkButton.setOnClickListener {
-            if (name == "匿名") {
+            if (userId == "匿名") {
                 Toast.makeText(this, "ログインが必要です", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            isBookmarked = !isBookmarked
-            if (isBookmarked) {
-                bookmarkButton.setImageResource(R.drawable.ic_heart_filled)
-                Toast.makeText(this, "ブックマークしました", Toast.LENGTH_SHORT).show()
-                // 必要に応じてAPIでブックマーク登録処理を追加
-            } else {
-                bookmarkButton.setImageResource(R.drawable.ic_heart_border)
-                Toast.makeText(this, "ブックマークを解除しました", Toast.LENGTH_SHORT).show()
-                // 必要に応じてAPIでブックマーク解除処理を追加
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    if (!isBookmarked) {
+                        val response = api.bookmarkBoard(userId, boardId)
+                        if (response.isSuccessful) {
+                            isBookmarked = true
+                            withContext(Dispatchers.Main) {
+                                updateBookmarkIcon()
+                                Toast.makeText(this@BoardActivity, "ブックマークしました", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    } else {
+                        val response = api.unbookmarkBoard(userId, boardId)
+                        if (response.isSuccessful) {
+                            isBookmarked = false
+                            withContext(Dispatchers.Main) {
+                                updateBookmarkIcon()
+                                Toast.makeText(this@BoardActivity, "ブックマークを解除しました", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@BoardActivity, "通信エラーが発生しました", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+
+        // 初期読み込み
+        CoroutineScope(Dispatchers.IO).launch {
+            checkBookmarkStatus()
+            withContext(Dispatchers.Main) {
+                updateBookmarkIcon()
             }
         }
 

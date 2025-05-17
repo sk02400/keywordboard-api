@@ -2,6 +2,7 @@
 package com.example.bulletinboard.network
 
 import com.example.bulletinboard.model.Post
+import com.example.bulletinboard.model.BookmarkStatusResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -19,17 +20,23 @@ interface ApiService {
     @POST("boards/{boardId}/posts")
     suspend fun createPost(@Path("boardId") boardId: String, @Body post: Post): Response<Unit>
 
-    @GET("bookmark/{userId}/{boardId}")
-    suspend fun isBookmarked(
+    // 🆕 ブックマーク状態を取得
+    @GET("bookmark/status/{userId}/{boardId}")
+    suspend fun getBookmarkStatus(
         @Path("userId") userId: String,
         @Path("boardId") boardId: String
-    ): Response<Boolean>
+    ): Response<BookmarkStatusResponse>
 
-    @POST("bookmark")
-    suspend fun addBookmark(@Body bookmark: BookmarkRequest): Response<Unit>
+    // 🆕 ブックマーク登録
+    @POST("bookmark/{userId}/{boardId}")
+    suspend fun bookmarkBoard(
+        @Path("userId") userId: String,
+        @Path("boardId") boardId: String
+    ): Response<Unit>
 
-    @DELETE("bookmark/{userId}/{boardId}")
-    suspend fun removeBookmark(
+    // 🆕 ブックマーク解除
+    @POST("unbookmark/{userId}/{boardId}")
+    suspend fun unbookmarkBoard(
         @Path("userId") userId: String,
         @Path("boardId") boardId: String
     ): Response<Unit>
