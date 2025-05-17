@@ -1,54 +1,55 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:background="#121212"
-    android:orientation="vertical"
-    android:padding="16dp"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ListView
-        android:id="@+id/postListView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:divider="#888"
-        android:dividerHeight="1dp" />
-
-    <EditText
-        android:id="@+id/editTextPost"
-        android:hint="投稿内容"
-        android:textColor="@android:color/black"
-        android:background="@android:drawable/edit_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <!-- 投稿＋ブックマークボタン行 -->
-    <LinearLayout
+    <!-- ツールバー（タイトル無し、右にブックマーク） -->
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        style="@style/Widget.Material3.Toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="end"
-        android:layout_marginTop="8dp">
+        android:background="?attr/colorPrimary"
+        app:title=""
+        app:menu="@menu/board_menu" />
 
-        <!-- ブックマークボタン（ハート） -->
-        <ImageButton
-            android:id="@+id/buttonBookmark"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_heart_border"
-            android:contentDescription="ブックマーク"
-            app:tint="#888888" />
+    <!-- メイン画面 -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:padding="16dp">
 
-        <!-- 投稿ボタン -->
-        <Button
-            android:id="@+id/buttonPost"
-            android:text="投稿"
-            android:background="#BB86FC"
-            android:textColor="#fff"
-            android:layout_width="0dp"
+        <!-- 投稿リスト -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/postRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
             android:layout_weight="1"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
+            android:clipToPadding="false"
+            android:paddingBottom="8dp" />
 
-</LinearLayout>
+        <!-- 投稿入力 -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextPost"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="投稿内容を入力" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/buttonPost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="投稿"
+            style="@style/Widget.Material3.Button"
+            android:layout_marginTop="8dp" />
+    </LinearLayout>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,34 +1,36 @@
 package com.example.bulletinboard
 
-import android.content.Context
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
-import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.example.bulletinboard.databinding.ItemPostBinding
 import com.example.bulletinboard.model.Post
 
-class PostAdapter(context: Context, private val posts: MutableList<Post>) :
-    ArrayAdapter<Post>(context, 0, posts) {
+class PostAdapter(private var posts: List<Post>) :
+    RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
 
-    override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        val post = getItem(position)
-        val view = convertView ?: LayoutInflater.from(context).inflate(R.layout.item_post, parent, false)
-
-        val nameText = view.findViewById<TextView>(R.id.textName)
-        val timeText = view.findViewById<TextView>(R.id.textTimestamp)
-        val contentText = view.findViewById<TextView>(R.id.textContent)
-
-        nameText.text = post?.name
-        timeText.text = post?.timestamp
-        contentText.text = post?.content
-
-        return view
+    inner class PostViewHolder(private val binding: ItemPostBinding) :
+        RecyclerView.ViewHolder(binding.root) {
+        fun bind(post: Post) {
+            binding.textName.text = post.name
+            binding.textTimestamp.text = post.timestamp
+            binding.textContent.text = post.content
+        }
     }
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PostViewHolder {
+        val binding = ItemPostBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return PostViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
+        holder.bind(posts[position])
+    }
+
+    override fun getItemCount(): Int = posts.size
+
     fun update(newPosts: List<Post>) {
-        posts.clear()
-        posts.addAll(newPosts)
+        posts = newPosts
         notifyDataSetChanged()
     }
 }
