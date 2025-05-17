@@ -1,30 +1,28 @@
 package com.example.bulletinboard
 
 import android.os.Bundle
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ListView
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import com.example.bulletinboard.model.Post
 import com.example.bulletinboard.network.ApiClient
 import kotlinx.coroutines.*
 import java.text.SimpleDateFormat
 import java.util.*
-import android.widget.Toast
 
 class BoardActivity : AppCompatActivity() {
     private val api = ApiClient.apiService
+    private var isBookmarked = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_board)
 
-        //val name = intent.getStringExtra("userName") ?: "匿名"
         val name = intent.getStringExtra("USER_ID") ?: "匿名"
         val boardId = intent.getStringExtra("BOARD_ID") ?: "default"
 
         val postInput = findViewById<EditText>(R.id.editTextPost)
         val postButton = findViewById<Button>(R.id.buttonPost)
+        val bookmarkButton = findViewById<ImageButton>(R.id.buttonBookmark)
         val postList = findViewById<ListView>(R.id.postListView)
 
         val adapter = PostAdapter(this, mutableListOf())
@@ -39,15 +37,12 @@ class BoardActivity : AppCompatActivity() {
                         withContext(Dispatchers.Main) {
                             adapter.update(posts)
                         }
-                    } else {
-                        // レスポンス失敗時の処理
                     }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 }
             }
         }
-
 
         postButton.setOnClickListener {
             val content = postInput.text.toString()
@@ -62,13 +57,11 @@ class BoardActivity : AppCompatActivity() {
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     val response = api.createPost(boardId, post)
-                    if (response.isSuccessful) {
-                        withContext(Dispatchers.Main) {
+                    withContext(Dispatchers.Main) {
+                        if (response.isSuccessful) {
                             postInput.text.clear()
                             loadPosts()
-                        }
-                    } else {
-                        withContext(Dispatchers.Main) {
+                        } else {
                             Toast.makeText(this@BoardActivity, "投稿に失敗しました", Toast.LENGTH_SHORT).show()
                         }
                     }
@@ -81,6 +74,24 @@ class BoardActivity : AppCompatActivity() {
             }
         }
 
+        // ❤️ ブックマークボタンの処理
+        bookmarkButton.setOnClickListener {
+            if (name == "匿名") {
+                Toast.makeText(this, "ログインが必要です", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            isBookmarked = !isBookmarked
+            if (isBookmarked) {
+                bookmarkButton.setImageResource(R.drawable.ic_heart_filled)
+                Toast.makeText(this, "ブックマークしました", Toast.LENGTH_SHORT).show()
+                // 必要に応じてAPIでブックマーク登録処理を追加
+            } else {
+                bookmarkButton.setImageResource(R.drawable.ic_heart_border)
+                Toast.makeText(this, "ブックマークを解除しました", Toast.LENGTH_SHORT).show()
+                // 必要に応じてAPIでブックマーク解除処理を追加
+            }
+        }
 
         loadPosts()
     }
