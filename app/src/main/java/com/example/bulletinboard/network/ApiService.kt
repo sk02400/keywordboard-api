@@ -3,6 +3,7 @@ package com.example.bulletinboard.network
 
 import com.example.bulletinboard.model.Post
 import com.example.bulletinboard.model.BookmarkStatusResponse
+import com.example.bulletinboard.model.Bookmark
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
@@ -41,4 +42,6 @@ interface ApiService {
         @Path("boardId") boardId: String
     ): Response<Unit>
 
+    @GET("bookmarks/{userId}")
+    suspend fun getBookmarks(@Path("userId") userId: String): List<Bookmark>
 }

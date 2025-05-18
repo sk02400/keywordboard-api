@@ -1,0 +1,42 @@
+package com.example.bulletinboard.adapter
+
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.recyclerview.widget.RecyclerView
+import com.example.bulletinboard.databinding.ItemBookmarkBinding
+
+class BookmarkAdapter(
+    private val context: Context,
+    private val bookmarks: List<String>,
+    private val onItemClick: (String) -> Unit
+) : RecyclerView.Adapter<BookmarkAdapter.BookmarkViewHolder>() {
+
+    inner class BookmarkViewHolder(val binding: ItemBookmarkBinding) :
+        RecyclerView.ViewHolder(binding.root)
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BookmarkViewHolder {
+        val binding = ItemBookmarkBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return BookmarkViewHolder(binding)
+    }
+
+    override fun onBindViewHolder(holder: BookmarkViewHolder, position: Int) {
+        val boardId = bookmarks[position]
+        holder.binding.boardIdText.text = boardId
+
+        holder.binding.copyButton.setOnClickListener {
+            val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+            clipboard.setPrimaryClip(ClipData.newPlainText("Board ID", boardId))
+            Toast.makeText(context, "IDをコピーしました", Toast.LENGTH_SHORT).show()
+        }
+
+        holder.binding.root.setOnClickListener {
+            onItemClick(boardId)
+        }
+    }
+
+    override fun getItemCount() = bookmarks.size
+}

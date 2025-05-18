@@ -38,13 +38,12 @@ class MainActivity : AppCompatActivity() {
             headerLayout.visibility = View.GONE
         }
 
-
+        val userId = UserSession(this).getLogin()
         buttonGo.setOnClickListener {
             val boardId = editTextBoardId.text.toString()
-            val userId = UserSession(this).getLogin()
 
             if (boardId.isBlank()) {
-                Toast.makeText(this, "掲示板IDを入力してください", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "キーワードを入力してください", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
@@ -75,16 +74,20 @@ class MainActivity : AppCompatActivity() {
 
         bookmarkButton.setOnClickListener {
             // 保存した掲示板一覧画面へ遷移
-            startActivity(Intent(this, BookmarkActivity::class.java))
+            val intent = Intent(this, BookmarkActivity::class.java)
+            intent.putExtra("USER_ID", userId)
+            startActivity(intent)
         }
 
         messageButton.setOnClickListener {
             // DM画面へ遷移
+            intent.putExtra("USER_ID", userId)
             startActivity(Intent(this, MessageActivity::class.java))
         }
 
         notificationButton.setOnClickListener {
             // 通知画面へ遷移
+            intent.putExtra("USER_ID", userId)
             startActivity(Intent(this, NotificationActivity::class.java))
         }
     }

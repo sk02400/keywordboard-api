@@ -1,2 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <style name="ButtonNoCorner" parent="Theme.Material3.Light.NoActionBar">
+        <item name="shapeAppearanceOverlay">@style/NoCornerShape</item>
+    </style>
+
+    <style name="NoCornerShape" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">0dp</item>
+    </style>
+</resources>
