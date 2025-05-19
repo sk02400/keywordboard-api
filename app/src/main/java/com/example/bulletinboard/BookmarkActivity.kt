@@ -25,18 +25,17 @@ class BookmarkActivity : AppCompatActivity() {
         binding = ActivityBookmarkBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // IntentからユーザーIDを取得
+        // IntentからユーザーIDと投稿者名を取得
         userId = intent.getStringExtra("USER_ID") ?: ""
         postName = intent.getStringExtra("POST_NAME") ?: ""
 
         if (userId.isEmpty()) {
-            // ユーザーIDがなければログイン画面などへ遷移させる処理を入れると安全です
             finish()
             return
         }
 
         apiService = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:3000/") // エミュレーターからローカルアクセス
+            .baseUrl("http://10.0.2.2:3000/")
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)
@@ -50,12 +49,11 @@ class BookmarkActivity : AppCompatActivity() {
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val bookmarks = apiService.getBookmarks(userId)
-                val boardIds = bookmarks.map { it.board_id }
 
                 runOnUiThread {
-                    binding.recyclerView.adapter = BookmarkAdapter(this@BookmarkActivity, boardIds) { boardId ->
+                    binding.recyclerView.adapter = BookmarkAdapter(this@BookmarkActivity, bookmarks) { bookmark ->
                         val intent = Intent(this@BookmarkActivity, BoardActivity::class.java)
-                        intent.putExtra("BOARD_ID", boardId)
+                        intent.putExtra("BOARD_ID", bookmark.board_id)
                         intent.putExtra("POST_NAME", postName)
                         intent.putExtra("USER_ID", userId)
                         startActivity(intent)
@@ -63,7 +61,7 @@ class BookmarkActivity : AppCompatActivity() {
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                // エラーハンドリング（Toastなど）
+                // 必要なら Toast などでユーザーにエラーを通知
             }
         }
     }

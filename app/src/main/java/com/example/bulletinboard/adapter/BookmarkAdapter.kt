@@ -8,11 +8,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bulletinboard.databinding.ItemBookmarkBinding
+import com.example.bulletinboard.model.Bookmark
 
 class BookmarkAdapter(
     private val context: Context,
-    private val bookmarks: List<String>,
-    private val onItemClick: (String) -> Unit
+    private val bookmarks: List<Bookmark>,
+    private val onItemClick: (Bookmark) -> Unit
 ) : RecyclerView.Adapter<BookmarkAdapter.BookmarkViewHolder>() {
 
     inner class BookmarkViewHolder(val binding: ItemBookmarkBinding) :
@@ -24,17 +25,17 @@ class BookmarkAdapter(
     }
 
     override fun onBindViewHolder(holder: BookmarkViewHolder, position: Int) {
-        val boardId = bookmarks[position]
-        holder.binding.boardIdText.text = boardId
+        val bookmark = bookmarks[position]
+        holder.binding.boardIdText.text = bookmark.board_name // 名前を表示
 
         holder.binding.copyButton.setOnClickListener {
             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            clipboard.setPrimaryClip(ClipData.newPlainText("Board ID", boardId))
+            clipboard.setPrimaryClip(ClipData.newPlainText("Board ID", bookmark.board_id))
             Toast.makeText(context, "IDをコピーしました", Toast.LENGTH_SHORT).show()
         }
 
         holder.binding.root.setOnClickListener {
-            onItemClick(boardId)
+            onItemClick(bookmark)
         }
     }
 

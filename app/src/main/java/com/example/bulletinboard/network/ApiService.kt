@@ -1,12 +1,13 @@
 // ApiService.kt
 package com.example.bulletinboard.network
 
+import com.example.bulletinboard.model.BoardIdResponse
+import com.example.bulletinboard.model.BoardNameRequest
 import com.example.bulletinboard.model.Post
 import com.example.bulletinboard.model.BookmarkStatusResponse
 import com.example.bulletinboard.model.Bookmark
 import retrofit2.Response
 import retrofit2.http.Body
-import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
@@ -14,6 +15,9 @@ import retrofit2.http.Path
 interface ApiService {
     @POST("login")
     suspend fun login(@Body loginRequest: LoginRequest): Response<LoginResponse>
+
+    @POST("boards")
+    suspend fun getOrCreateBoard(@Body request: BoardNameRequest): BoardIdResponse
 
     @GET("posts/{boardId}")
     suspend fun getPosts(@Path("boardId") boardId: String): Response<List<Post>>

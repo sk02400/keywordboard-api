@@ -71,9 +71,9 @@
         android:hint="名前"
         android:text="ゲスト" />
 
-    <!-- 掲示板ID入力 -->
+    <!-- 掲示板名入力 -->
     <EditText
-        android:id="@+id/editTextBoardId"
+        android:id="@+id/editTextBoardName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="キーワード（URL等）を入力してください"

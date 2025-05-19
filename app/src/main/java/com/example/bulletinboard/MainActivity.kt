@@ -2,33 +2,42 @@ package com.example.bulletinboard
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
-import androidx.appcompat.app.AppCompatActivity
-import com.example.bulletinboard.UserSession
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.bulletinboard.model.BoardNameRequest
+import com.example.bulletinboard.network.ApiClient
+import com.example.bulletinboard.network.ApiService
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var userSession: UserSession
-    private lateinit var loginButton: Button  // ← 追加
-    private lateinit var headerLayout: View   // ← 追加
+    private lateinit var loginButton: Button
+    private lateinit var headerLayout: View
     private lateinit var buttonGo: Button
+    private lateinit var apiService: ApiService
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        apiService = ApiClient.apiService
         userSession = UserSession(this)
-        buttonGo = findViewById(R.id.buttonGo)
 
+        buttonGo = findViewById(R.id.buttonGo)
         loginButton = findViewById(R.id.buttonLogin)
         headerLayout = findViewById(R.id.headerLayout)
         val bookmarkButton = findViewById<Button>(R.id.buttonBookmark)
         val messageButton = findViewById<Button>(R.id.buttonMessage)
         val notificationButton = findViewById<Button>(R.id.buttonNotification)
-        val editTextBoardId = findViewById<EditText>(R.id.editTextBoardId)
+        val editTextBoardName = findViewById<EditText>(R.id.editTextBoardName)
         val editTextPostName = findViewById<EditText>(R.id.editTextName)
 
         if (userSession.isLoggedIn()) {
@@ -39,62 +48,70 @@ class MainActivity : AppCompatActivity() {
             headerLayout.visibility = View.GONE
         }
 
-        val userId = UserSession(this).getLogin()
-        //val postName = UserSession(this).getPostName()
+        val userId = userSession.getLogin()
+
         buttonGo.setOnClickListener {
-            val boardId = editTextBoardId.text.toString()
+            val boardName = editTextBoardName.text.toString()
             val postName = editTextPostName.text.toString()
 
-            if (boardId.isBlank()) {
-                Toast.makeText(this, "キーワードを入力してください", Toast.LENGTH_SHORT).show()
+            if (boardName.isBlank()) {
+                Toast.makeText(this, "掲示板名を入力してください", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-//            if (userId == null) {
-//                Toast.makeText(this, "ログイン情報が見つかりません", Toast.LENGTH_SHORT).show()
-//                return@setOnClickListener
-//            }
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    val response = apiService.getOrCreateBoard(BoardNameRequest(boardName))
+                    val boardId = response.board_id
 
-            // BoardActivityへ遷移
-            val intent = Intent(this, BoardActivity::class.java)
-            intent.putExtra("BOARD_ID", boardId)
-            intent.putExtra("USER_ID", userId)
-            intent.putExtra("POST_NAME", postName)
-            startActivity(intent)
+                    withContext(Dispatchers.Main) {
+                        val intent = Intent(this@MainActivity, BoardActivity::class.java).apply {
+                            putExtra("BOARD_ID", boardId.toString())
+                            putExtra("USER_ID", userId)
+                            putExtra("POST_NAME", postName)
+                        }
+                        startActivity(intent)
+                    }
+
+                } catch (e: Exception) {
+                    Log.e("Login", "エラー: ${e.message}", e)
+                    withContext(Dispatchers.Main) {
+                        Toast.makeText(this@MainActivity, "掲示板作成に失敗しました", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
 
         loginButton.setOnClickListener {
             if (userSession.isLoggedIn()) {
-                // ログアウト処理
                 userSession.logout()
                 loginButton.text = "ログイン"
                 headerLayout.visibility = View.GONE
             } else {
-                // ログイン画面へ遷移
-                val intent = Intent(this, LoginActivity::class.java)
-                startActivity(intent)
+                startActivity(Intent(this, LoginActivity::class.java))
             }
         }
 
         bookmarkButton.setOnClickListener {
-            // 保存した掲示板一覧画面へ遷移
-            val intent = Intent(this, BookmarkActivity::class.java)
-            val postName = editTextPostName.text.toString()
-            intent.putExtra("USER_ID", userId)
-            intent.putExtra("POST_NAME", postName)
+            val intent = Intent(this, BookmarkActivity::class.java).apply {
+                putExtra("USER_ID", userId)
+                putExtra("POST_NAME", editTextPostName.text.toString())
+            }
             startActivity(intent)
         }
 
         messageButton.setOnClickListener {
-            // DM画面へ遷移
-            intent.putExtra("USER_ID", userId)
-            startActivity(Intent(this, MessageActivity::class.java))
+            val intent = Intent(this, MessageActivity::class.java).apply {
+                putExtra("USER_ID", userId)
+            }
+            startActivity(intent)
         }
 
         notificationButton.setOnClickListener {
-            // 通知画面へ遷移
-            intent.putExtra("USER_ID", userId)
-            startActivity(Intent(this, NotificationActivity::class.java))
+            val intent = Intent(this, NotificationActivity::class.java).apply {
+                putExtra("USER_ID", userId)
+            }
+            startActivity(intent)
         }
     }
 
