@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bulletinboard.databinding.ItemPostBinding
 import com.example.bulletinboard.model.Post
+import android.widget.TextView
 
 class PostAdapter(private var posts: List<Post>) :
     RecyclerView.Adapter<PostAdapter.PostViewHolder>() {
@@ -25,6 +26,7 @@ class PostAdapter(private var posts: List<Post>) :
 
     override fun onBindViewHolder(holder: PostViewHolder, position: Int) {
         holder.bind(posts[position])
+        holder.itemView.findViewById<TextView>(R.id.textNo).text = "${position + 1}."
     }
 
     override fun getItemCount(): Int = posts.size
