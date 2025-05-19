@@ -29,6 +29,7 @@ class MainActivity : AppCompatActivity() {
         val messageButton = findViewById<Button>(R.id.buttonMessage)
         val notificationButton = findViewById<Button>(R.id.buttonNotification)
         val editTextBoardId = findViewById<EditText>(R.id.editTextBoardId)
+        val editTextPostName = findViewById<EditText>(R.id.editTextName)
 
         if (userSession.isLoggedIn()) {
             loginButton.visibility = View.GONE
@@ -39,8 +40,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         val userId = UserSession(this).getLogin()
+        //val postName = UserSession(this).getPostName()
         buttonGo.setOnClickListener {
             val boardId = editTextBoardId.text.toString()
+            val postName = editTextPostName.text.toString()
 
             if (boardId.isBlank()) {
                 Toast.makeText(this, "キーワードを入力してください", Toast.LENGTH_SHORT).show()
@@ -56,6 +59,7 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, BoardActivity::class.java)
             intent.putExtra("BOARD_ID", boardId)
             intent.putExtra("USER_ID", userId)
+            intent.putExtra("POST_NAME", postName)
             startActivity(intent)
         }
 
@@ -75,7 +79,9 @@ class MainActivity : AppCompatActivity() {
         bookmarkButton.setOnClickListener {
             // 保存した掲示板一覧画面へ遷移
             val intent = Intent(this, BookmarkActivity::class.java)
+            val postName = editTextPostName.text.toString()
             intent.putExtra("USER_ID", userId)
+            intent.putExtra("POST_NAME", postName)
             startActivity(intent)
         }
 

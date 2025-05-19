@@ -11,6 +11,7 @@ class UserSession(context: Context) {
     companion object {
         private const val KEY_IS_LOGGED_IN = "is_logged_in"
         private const val KEY_USER_ID = "user_id"
+        private const val KEY_POST_NAME = "post_name"
     }
 
     fun setLogin(userId: String) {
@@ -22,10 +23,17 @@ class UserSession(context: Context) {
     fun getLogin(): String? {
         return prefs.getString(KEY_USER_ID, null)
     }
-
+    fun getPostName(): String? {
+        return prefs.getString(KEY_POST_NAME, null)
+    }
     fun saveUserId(userId: String) {
         prefs.edit()
             .putString(KEY_USER_ID, userId)
+            .apply()
+    }
+    fun savePostName(postName: String) {
+        prefs.edit()
+            .putString(KEY_POST_NAME, postName)
             .apply()
     }
     fun logout() {

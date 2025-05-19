@@ -12,7 +12,7 @@ class PostAdapter(private var posts: List<Post>) :
     inner class PostViewHolder(private val binding: ItemPostBinding) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(post: Post) {
-            binding.textName.text = post.name
+            binding.textName.text = post.post_name
             binding.textTimestamp.text = post.timestamp
             binding.textContent.text = post.content
         }

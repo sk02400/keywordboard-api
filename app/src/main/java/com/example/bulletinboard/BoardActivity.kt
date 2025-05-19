@@ -19,6 +19,7 @@ class BoardActivity : AppCompatActivity() {
     private var isBookmarked = false
     private lateinit var adapter: PostAdapter
     private lateinit var userId: String
+    private lateinit var postName: String
     private lateinit var boardId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,6 +28,7 @@ class BoardActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         userId = intent.getStringExtra("USER_ID") ?: "匿名"
+        postName = intent.getStringExtra("POST_NAME") ?: "匿名"
         boardId = intent.getStringExtra("BOARD_ID") ?: "default"
 
         // ツールバーセット＆戻るボタン表示
@@ -49,7 +51,7 @@ class BoardActivity : AppCompatActivity() {
             }
 
             val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
-            val post = Post(name = userId, content = content, timestamp = timestamp)
+            val post = Post(user_id = userId , post_name = postName, content = content, timestamp = timestamp)
 
             CoroutineScope(Dispatchers.IO).launch {
                 try {

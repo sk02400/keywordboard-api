@@ -18,6 +18,7 @@ class BookmarkActivity : AppCompatActivity() {
     private lateinit var binding: ActivityBookmarkBinding
     private lateinit var apiService: ApiService
     private lateinit var userId: String
+    private lateinit var postName: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +27,7 @@ class BookmarkActivity : AppCompatActivity() {
 
         // IntentからユーザーIDを取得
         userId = intent.getStringExtra("USER_ID") ?: ""
+        postName = intent.getStringExtra("POST_NAME") ?: ""
 
         if (userId.isEmpty()) {
             // ユーザーIDがなければログイン画面などへ遷移させる処理を入れると安全です
@@ -54,6 +56,8 @@ class BookmarkActivity : AppCompatActivity() {
                     binding.recyclerView.adapter = BookmarkAdapter(this@BookmarkActivity, boardIds) { boardId ->
                         val intent = Intent(this@BookmarkActivity, BoardActivity::class.java)
                         intent.putExtra("BOARD_ID", boardId)
+                        intent.putExtra("POST_NAME", postName)
+                        intent.putExtra("USER_ID", userId)
                         startActivity(intent)
                     }
                 }
