@@ -16,6 +16,8 @@
         <activity android:name=".BoardActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".BookmarkActivity" />
+        <activity android:name=".MessageListActivity" />
+        <activity android:name=".ChatActivity" />
         <activity
             android:name=".MainActivity"
             android:exported="true">

@@ -101,9 +101,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         messageButton.setOnClickListener {
-            val intent = Intent(this, MessageActivity::class.java).apply {
-                putExtra("USER_ID", userId)
-            }
+            val intent = Intent(this, MessageListActivity::class.java)
+            intent.putExtra("USER_ID", userId)
+            intent.putExtra("POST_NAME", editTextPostName.text.toString())
             startActivity(intent)
         }
 

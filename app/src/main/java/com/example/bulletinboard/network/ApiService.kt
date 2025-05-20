@@ -1,11 +1,6 @@
-// ApiService.kt
 package com.example.bulletinboard.network
 
-import com.example.bulletinboard.model.BoardIdResponse
-import com.example.bulletinboard.model.BoardNameRequest
-import com.example.bulletinboard.model.Post
-import com.example.bulletinboard.model.BookmarkStatusResponse
-import com.example.bulletinboard.model.Bookmark
+import com.example.bulletinboard.model.*
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -23,23 +18,23 @@ interface ApiService {
     suspend fun getPosts(@Path("boardId") boardId: String): Response<List<Post>>
 
     @POST("boards/{boardId}/posts")
-    suspend fun createPost(@Path("boardId") boardId: String, @Body post: Post): Response<Unit>
+    suspend fun createPost(
+        @Path("boardId") boardId: String,
+        @Body post: Post
+    ): Response<Unit>
 
-    // 🆕 ブックマーク状態を取得
     @GET("bookmark/status/{userId}/{boardId}")
     suspend fun getBookmarkStatus(
         @Path("userId") userId: String,
         @Path("boardId") boardId: String
     ): Response<BookmarkStatusResponse>
 
-    // 🆕 ブックマーク登録
     @POST("bookmark/{userId}/{boardId}")
     suspend fun bookmarkBoard(
         @Path("userId") userId: String,
         @Path("boardId") boardId: String
     ): Response<Unit>
 
-    // 🆕 ブックマーク解除
     @POST("unbookmark/{userId}/{boardId}")
     suspend fun unbookmarkBoard(
         @Path("userId") userId: String,
@@ -48,4 +43,35 @@ interface ApiService {
 
     @GET("bookmarks/{userId}")
     suspend fun getBookmarks(@Path("userId") userId: String): List<Bookmark>
+
+    @GET("chats/{userId}")
+    suspend fun getChatRooms(@Path("userId") userId: String): List<ChatRoom>
+
+    @GET("users/{userId}/exists")
+    suspend fun checkUserExists(@Path("userId") userId: String): ExistsResponse
+
+    @POST("chats")
+    suspend fun createChat(@Body body: CreateChatRequest): ChatRoom
+
+    @GET("messages/{roomId}")
+    suspend fun getMessages(@Path("roomId") roomId: String): List<Message>
+
+    @POST("messages")
+    suspend fun sendMessage(@Body request: SendMessageRequest): Response<Unit>
+
+    // === データクラス ===
+
+    data class ExistsResponse(val exists: Boolean)
+
+    data class CreateChatRequest(
+        val user1_id: String,
+        val user2_id: String
+    )
+
+    data class SendMessageRequest(
+        val room_id: String,
+        val sender_id: String,
+        val sender_name: String,
+        val content: String
+    )
 }
