@@ -1,6 +1,7 @@
 package com.example.bulletinboard
 
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
@@ -61,6 +62,8 @@ class BoardActivity : AppCompatActivity() {
                             binding.editTextPost.text?.clear()
                             loadPosts()
                         } else {
+                            val errorBodyString = response.errorBody()?.string()
+                            Log.e("board", "エラーレスポンス body: $errorBodyString")
                             Toast.makeText(this@BoardActivity, "投稿に失敗しました", Toast.LENGTH_SHORT).show()
                         }
                     }

@@ -61,7 +61,7 @@ class MainActivity : AppCompatActivity() {
 
             CoroutineScope(Dispatchers.IO).launch {
                 try {
-                    val response = apiService.getOrCreateBoard(BoardNameRequest(boardName))
+                    val response = apiService.getOrCreateBoard(BoardNameRequest(boardName, userId))
                     val boardId = response.board_id
 
                     withContext(Dispatchers.Main) {
