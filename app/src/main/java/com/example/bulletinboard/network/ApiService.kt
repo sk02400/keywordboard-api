@@ -6,6 +6,9 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
+import retrofit2.http.Query
+
+import com.example.bulletinboard.network.RegisterAfterGoogleRequest
 
 interface ApiService {
     @POST("login")
@@ -59,6 +62,25 @@ interface ApiService {
     @POST("messages")
     suspend fun sendMessage(@Body request: SendMessageRequest): Response<Unit>
 
+    @POST("auth/google")
+    suspend fun googleLogin(
+        @Body request: GoogleLoginRequest
+    ): Response<LoginResponse>
+
+    @POST("/auth/register_after_google")
+    suspend fun registerAfterGoogle(@Body request: RegisterAfterGoogleRequest): Response<RegisterAfterGoogleResponse>
+
+    data class CheckUserResponse(val exists: Boolean, val userId: String?, val name: String?)
+    data class RegisterResponse(val success: Boolean, val message: String?)
+
+    @GET("user/exists")
+    suspend fun checkUserExistsByEmail(@Query("email") email: String): CheckUserResponse
+
+    @POST("user/register")
+    suspend fun registerUser(@Body req: RegisterRequest): RegisterResponse
+
+    @POST("/auth/google-register")
+    suspend fun registerAfterGoogleLogin(@Body request: RegisterRequest): Response<BasicResponse>
     // === データクラス ===
 
     data class ExistsResponse(val exists: Boolean)
@@ -74,4 +96,5 @@ interface ApiService {
         val sender_name: String,
         val content: String
     )
+
 }

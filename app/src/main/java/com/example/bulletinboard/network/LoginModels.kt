@@ -9,7 +9,8 @@ data class LoginRequest(
 
 @Serializable
 data class LoginResponse(
-    val success: Boolean,
-    val token: String?,        // 必要に応じて変更
-    val message: String?
+    val token: String? = null,
+    val message: String? = null,
+    val success: Boolean
 )
+
