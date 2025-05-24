@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="ButtonNoCorner" parent="Theme.Material3.Light.NoActionBar">
-        <item name="shapeAppearanceOverlay">@style/NoCornerShape</item>
+
+    <style name="ButtonNoCorner" parent="Theme.Material3.DayNight">
+        <item name="cornerRadius">0dp</item>
+        <item name="android:backgroundTint">@null</item>
     </style>
+
+
 
     <style name="NoCornerShape" parent="">
         <item name="cornerFamily">rounded</item>

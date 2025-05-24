@@ -3,64 +3,58 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#FFFFFF"
     android:padding="24dp">
 
-    <!-- ヘッダー（ログイン済みのとき表示） -->
+    <!-- ヘッダー -->
     <LinearLayout
         android:id="@+id/headerLayout"
         android:layout_width="match_parent"
-        android:layout_height="48dp"
+        android:layout_height="56dp"
         android:orientation="horizontal"
         android:visibility="gone"
-        android:padding="0dp"
-        android:layout_margin="0dp"
-        android:background="#1e1e1e">
+        android:background="#FFFFFF"
+        android:gravity="end|center_vertical"
+        android:paddingEnd="16dp"
+        android:paddingStart="16dp"
+        android:elevation="4dp">
 
-        <Button
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <!-- ブックマーク -->
+        <ImageButton
             android:id="@+id/buttonBookmark"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="ブックマーク"
-            android:background="#2c2c2c"
-            android:textColor="#FFFFFF"
-            android:padding="0dp"
-            android:stateListAnimator="@null"
-            android:theme="@style/ButtonNoCorner" />
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_bookmark"
+            android:contentDescription="ブックマーク"
+            android:tint="#212121" />
 
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="#444444" />
-
-        <Button
+        <!-- メッセージ -->
+        <ImageButton
             android:id="@+id/buttonMessage"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="メッセージ"
-            android:background="#2c2c2c"
-            android:textColor="#FFFFFF"
-            android:padding="0dp"
-            android:stateListAnimator="@null"
-            android:theme="@style/ButtonNoCorner" />
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_message"
+            android:contentDescription="メッセージ"
+            android:tint="#212121"
+            android:layout_marginStart="12dp" />
 
-        <View
-            android:layout_width="1dp"
-            android:layout_height="match_parent"
-            android:background="#444444" />
-
-        <Button
+        <!-- 通知 -->
+        <ImageButton
             android:id="@+id/buttonNotification"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="通知"
-            android:background="#2c2c2c"
-            android:textColor="#FFFFFF"
-            android:padding="0dp"
-            android:stateListAnimator="@null"
-            android:theme="@style/ButtonNoCorner" />
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/ic_notifications"
+            android:contentDescription="通知"
+            android:tint="#212121"
+            android:layout_marginStart="12dp" />
     </LinearLayout>
 
     <!-- 名前入力 -->
@@ -69,7 +63,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="名前"
-        android:text="ゲスト" />
+        android:text="ゲスト"
+        android:textColor="#212121"
+        android:textColorHint="#888888"
+        android:background="#F5F5F5"
+        android:padding="12dp"
+        android:layout_marginTop="24dp" />
 
     <!-- 掲示板名入力 -->
     <EditText
@@ -77,6 +76,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="キーワード（URL等）を入力してください"
+        android:textColor="#212121"
+        android:textColorHint="#888888"
+        android:background="#F5F5F5"
+        android:padding="12dp"
         android:layout_marginTop="12dp" />
 
     <!-- GOボタン -->
@@ -85,6 +88,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="GO"
+        android:background="#000000"
+        android:textColor="#FFFFFF"
+        android:stateListAnimator="@null"
+        android:theme="@style/ButtonNoCorner"
         android:layout_marginTop="16dp" />
 
     <!-- ログインボタン -->
@@ -93,5 +100,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="ログイン"
+        android:background="#000000"
+        android:textColor="#FFFFFF"
+        android:stateListAnimator="@null"
+        android:theme="@style/ButtonNoCorner"
         android:layout_marginTop="16dp" />
+
 </LinearLayout>

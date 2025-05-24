@@ -1,11 +1,13 @@
 package com.example.bulletinboard
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.bulletinboard.model.BoardNameRequest
@@ -24,6 +26,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var buttonGo: Button
     private lateinit var apiService: ApiService
 
+    @SuppressLint("WrongViewCast")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -34,9 +37,9 @@ class MainActivity : AppCompatActivity() {
         buttonGo = findViewById(R.id.buttonGo)
         loginButton = findViewById(R.id.buttonLogin)
         headerLayout = findViewById(R.id.headerLayout)
-        val bookmarkButton = findViewById<Button>(R.id.buttonBookmark)
-        val messageButton = findViewById<Button>(R.id.buttonMessage)
-        val notificationButton = findViewById<Button>(R.id.buttonNotification)
+        val bookmarkButton = findViewById<ImageButton>(R.id.buttonBookmark)
+        val messageButton = findViewById<ImageButton>(R.id.buttonMessage)
+        val notificationButton = findViewById<ImageButton>(R.id.buttonNotification)
         val editTextBoardName = findViewById<EditText>(R.id.editTextBoardName)
         val editTextPostName = findViewById<EditText>(R.id.editTextName)
 

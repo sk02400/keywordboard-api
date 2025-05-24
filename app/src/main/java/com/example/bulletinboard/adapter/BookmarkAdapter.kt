@@ -26,7 +26,7 @@ class BookmarkAdapter(
 
     override fun onBindViewHolder(holder: BookmarkViewHolder, position: Int) {
         val bookmark = bookmarks[position]
-        holder.binding.boardIdText.text = bookmark.board_name // 名前を表示
+        holder.binding.boardIdText.text = bookmark.board_code // 名前を表示
 
         holder.binding.copyButton.setOnClickListener {
             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager

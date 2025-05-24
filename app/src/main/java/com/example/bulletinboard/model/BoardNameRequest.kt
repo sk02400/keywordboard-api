@@ -4,6 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class BoardNameRequest(
-    val board_name: String,
+    val board_code: String,
     val user_id: String?
 )
