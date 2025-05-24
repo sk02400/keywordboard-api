@@ -68,6 +68,7 @@
         android:textColorHint="#888888"
         android:background="#F5F5F5"
         android:padding="12dp"
+        android:maxLength="100"
         android:layout_marginTop="24dp" />
 
     <!-- 掲示板名入力 -->
@@ -80,7 +81,10 @@
         android:textColorHint="#888888"
         android:background="#F5F5F5"
         android:padding="12dp"
-        android:layout_marginTop="12dp" />
+        android:layout_marginTop="12dp"
+        android:drawableEnd="@drawable/ic_clear"
+        android:maxLength="1000"
+        android:drawablePadding="8dp" />
 
     <!-- GOボタン -->
     <Button

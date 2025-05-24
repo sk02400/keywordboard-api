@@ -41,6 +41,7 @@
                 android:id="@+id/editTextPost"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:maxLength="1000"
                 android:hint="投稿内容を入力" />
         </com.google.android.material.textfield.TextInputLayout>
 

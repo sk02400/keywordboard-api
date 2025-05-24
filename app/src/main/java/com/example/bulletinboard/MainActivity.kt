@@ -2,14 +2,19 @@ package com.example.bulletinboard
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.view.MotionEvent
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import com.example.bulletinboard.model.BoardNameRequest
 import com.example.bulletinboard.network.ApiClient
 import com.example.bulletinboard.network.ApiService
@@ -25,8 +30,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var headerLayout: View
     private lateinit var buttonGo: Button
     private lateinit var apiService: ApiService
+    private lateinit var editTextBoardName: EditText
+    private lateinit var clearIcon: Drawable
 
-    @SuppressLint("WrongViewCast")
+    @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -40,8 +47,32 @@ class MainActivity : AppCompatActivity() {
         val bookmarkButton = findViewById<ImageButton>(R.id.buttonBookmark)
         val messageButton = findViewById<ImageButton>(R.id.buttonMessage)
         val notificationButton = findViewById<ImageButton>(R.id.buttonNotification)
-        val editTextBoardName = findViewById<EditText>(R.id.editTextBoardName)
+        editTextBoardName = findViewById(R.id.editTextBoardName)
         val editTextPostName = findViewById<EditText>(R.id.editTextName)
+
+        clearIcon = ContextCompat.getDrawable(this, R.drawable.ic_clear)!!
+        setClearIconVisible(false)
+
+        editTextBoardName.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                setClearIconVisible(!s.isNullOrEmpty())
+            }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
+        editTextBoardName.setOnTouchListener { _, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                val drawableEnd = editTextBoardName.compoundDrawablesRelative[2]
+                if (drawableEnd != null &&
+                    event.rawX >= (editTextBoardName.right - drawableEnd.bounds.width() - editTextBoardName.paddingEnd)
+                ) {
+                    editTextBoardName.text.clear()
+                    return@setOnTouchListener true
+                }
+            }
+            false
+        }
 
         if (userSession.isLoggedIn()) {
             loginButton.visibility = View.GONE
@@ -116,6 +147,11 @@ class MainActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
+    }
+
+    private fun setClearIconVisible(visible: Boolean) {
+        val icon = if (visible) clearIcon else null
+        editTextBoardName.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, icon, null)
     }
 
     override fun onResume() {
