@@ -40,7 +40,7 @@ class ChatActivity : AppCompatActivity() {
         partnerId = intent.getStringExtra("PARTNER_ID") ?: ""
 
         setSupportActionBar(binding.toolbar)
-        supportActionBar?.title = "チャット - $partnerId"
+        supportActionBar?.title = "$partnerId"
 
         api = Retrofit.Builder()
             .baseUrl("http://10.0.2.2:3000/")

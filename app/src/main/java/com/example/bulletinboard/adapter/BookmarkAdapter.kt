@@ -26,12 +26,13 @@ class BookmarkAdapter(
 
     override fun onBindViewHolder(holder: BookmarkViewHolder, position: Int) {
         val bookmark = bookmarks[position]
-        holder.binding.boardIdText.text = bookmark.board_code // 名前を表示
+        // board_code → page_title に変更
+        holder.binding.pageTitleText.text = bookmark.page_title
 
         holder.binding.copyButton.setOnClickListener {
             val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-            clipboard.setPrimaryClip(ClipData.newPlainText("Board ID", bookmark.board_id))
-            Toast.makeText(context, "IDをコピーしました", Toast.LENGTH_SHORT).show()
+            clipboard.setPrimaryClip(ClipData.newPlainText("Page Title", bookmark.page_title))
+            Toast.makeText(context, "タイトルをコピーしました", Toast.LENGTH_SHORT).show()
         }
 
         holder.binding.root.setOnClickListener {

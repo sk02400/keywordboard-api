@@ -2,6 +2,7 @@ package com.example.bulletinboard
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bulletinboard.adapter.BookmarkAdapter
@@ -51,17 +52,31 @@ class BookmarkActivity : AppCompatActivity() {
                 val bookmarks = apiService.getBookmarks(userId)
 
                 runOnUiThread {
-                    binding.recyclerView.adapter = BookmarkAdapter(this@BookmarkActivity, bookmarks) { bookmark ->
-                        val intent = Intent(this@BookmarkActivity, BoardActivity::class.java)
-                        intent.putExtra("BOARD_ID", bookmark.board_id)
-                        intent.putExtra("POST_NAME", postName)
-                        intent.putExtra("USER_ID", userId)
-                        startActivity(intent)
+                    if (bookmarks.isEmpty()) {
+                        // ブックマークが0件のとき
+                        binding.textViewNoBookmarks.visibility = View.VISIBLE
+                        binding.recyclerView.visibility = View.GONE
+                    } else {
+                        // ブックマークがあるとき
+                        binding.textViewNoBookmarks.visibility = View.GONE
+                        binding.recyclerView.visibility = View.VISIBLE
+                        binding.recyclerView.adapter = BookmarkAdapter(this@BookmarkActivity, bookmarks) { bookmark ->
+                            val intent = Intent(this@BookmarkActivity, BoardActivity::class.java)
+                            intent.putExtra("BOARD_ID", bookmark.board_id)
+                            intent.putExtra("POST_NAME", postName)
+                            intent.putExtra("USER_ID", userId)
+                            startActivity(intent)
+                        }
                     }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
-                // 必要なら Toast などでユーザーにエラーを通知
+                runOnUiThread {
+                    // エラー時はメッセージを表示してRecyclerViewは非表示にするなど対応可能
+                    binding.textViewNoBookmarks.text = "読み込みに失敗しました"
+                    binding.textViewNoBookmarks.visibility = View.VISIBLE
+                    binding.recyclerView.visibility = View.GONE
+                }
             }
         }
     }

@@ -30,7 +30,8 @@
         android:id="@+id/buttonSignup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="サインアップ" />
+        android:text="サインアップ"
+        android:visibility="gone" />
 
     <!-- Google Sign-In Button -->
     <Button

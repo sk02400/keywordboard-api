@@ -7,10 +7,10 @@
     android:padding="12dp">
 
     <TextView
-        android:id="@+id/boardIdText"
+        android:id="@+id/pageTitleText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="Board ID"
+        android:text="ページタイトル"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/copyButton"
