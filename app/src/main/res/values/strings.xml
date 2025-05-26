@@ -2,4 +2,5 @@
 <resources>
     <string name="app_name">BulletinBoard</string>
     <string name="default_web_client_id">407964159782-csb5sa23om98fndtjnacv2vlcig6qct4.apps.googleusercontent.com</string>
+    <string name="favicon">ページアイコン</string>
 </resources>

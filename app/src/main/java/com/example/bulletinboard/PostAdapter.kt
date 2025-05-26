@@ -14,7 +14,7 @@ class PostAdapter(private var posts: List<Post>) :
         RecyclerView.ViewHolder(binding.root) {
         fun bind(post: Post) {
             binding.textName.text = post.post_name
-            binding.textTimestamp.text = post.timestamp
+            binding.textTimestamp.text = post.created_at
             binding.textContent.text = post.content
         }
     }

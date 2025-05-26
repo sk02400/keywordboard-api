@@ -83,6 +83,9 @@ interface ApiService {
     suspend fun registerAfterGoogleLogin(@Body request: RegisterRequest): Response<BasicResponse>
     // === データクラス ===
 
+    @GET("boards/ranking/day")
+    suspend fun getDailyRanking(): List<BoardRanking>
+
     data class ExistsResponse(val exists: Boolean)
 
     data class CreateChatRequest(

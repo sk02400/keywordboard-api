@@ -15,7 +15,11 @@ import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.bulletinboard.adapter.RankingAdapter
+import com.example.bulletinboard.databinding.ActivityMainBinding
 import com.example.bulletinboard.model.BoardNameRequest
+import com.example.bulletinboard.model.BoardRanking
 import com.example.bulletinboard.network.ApiClient
 import com.example.bulletinboard.network.ApiService
 import kotlinx.coroutines.CoroutineScope
@@ -25,6 +29,7 @@ import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var binding: ActivityMainBinding
     private lateinit var userSession: UserSession
     private lateinit var loginButton: Button
     private lateinit var headerLayout: View
@@ -36,7 +41,9 @@ class MainActivity : AppCompatActivity() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
 
         apiService = ApiClient.apiService
         userSession = UserSession(this)
@@ -53,7 +60,11 @@ class MainActivity : AppCompatActivity() {
         clearIcon = ContextCompat.getDrawable(this, R.drawable.ic_clear)!!
         setClearIconVisible(false)
 
-        editTextBoardName.addTextChangedListener(object : TextWatcher {
+        val userId = userSession.getLogin()
+        val postNameField = binding.editTextName
+
+        // テキスト変更でクリアアイコン表示
+        binding.editTextBoardName.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 setClearIconVisible(!s.isNullOrEmpty())
             }
@@ -61,32 +72,37 @@ class MainActivity : AppCompatActivity() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        editTextBoardName.setOnTouchListener { _, event ->
+        // クリアアイコンタップで入力リセット
+        binding.editTextBoardName.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_UP) {
-                val drawableEnd = editTextBoardName.compoundDrawablesRelative[2]
+                val drawableEnd = binding.editTextBoardName.compoundDrawablesRelative[2]
                 if (drawableEnd != null &&
-                    event.rawX >= (editTextBoardName.right - drawableEnd.bounds.width() - editTextBoardName.paddingEnd)
+                    event.rawX >= (binding.editTextBoardName.right - drawableEnd.bounds.width() - binding.editTextBoardName.paddingEnd)
                 ) {
-                    editTextBoardName.text.clear()
+                    binding.editTextBoardName.text.clear()
                     return@setOnTouchListener true
                 }
             }
             false
         }
 
-        if (userSession.isLoggedIn()) {
-            loginButton.visibility = View.GONE
-            headerLayout.visibility = View.VISIBLE
-        } else {
-            loginButton.visibility = View.VISIBLE
-            headerLayout.visibility = View.GONE
+        // ログインUI状態更新
+        updateLoginUI()
+
+        // ログイン・ログアウト切り替え
+        binding.buttonLogin.setOnClickListener {
+            if (userSession.isLoggedIn()) {
+                userSession.logout()
+                updateLoginUI()
+            } else {
+                startActivity(Intent(this, LoginActivity::class.java))
+            }
         }
 
-        val userId = userSession.getLogin()
-
-        buttonGo.setOnClickListener {
-            val boardName = editTextBoardName.text.toString()
-            val postName = editTextPostName.text.toString()
+        // 掲示板に移動ボタン
+        binding.buttonGo.setOnClickListener {
+            val boardName = binding.editTextBoardName.text.toString()
+            val postName = postNameField.text.toString()
 
             if (boardName.isBlank()) {
                 Toast.makeText(this, "掲示板名を入力してください", Toast.LENGTH_SHORT).show()
@@ -97,7 +113,6 @@ class MainActivity : AppCompatActivity() {
                 try {
                     val response = apiService.getOrCreateBoard(BoardNameRequest(boardName, userId))
                     val boardId = response.board_id
-
                     withContext(Dispatchers.Main) {
                         val intent = Intent(this@MainActivity, BoardActivity::class.java).apply {
                             putExtra("BOARD_ID", boardId.toString())
@@ -106,16 +121,14 @@ class MainActivity : AppCompatActivity() {
                         }
                         startActivity(intent)
                     }
-
                 } catch (e: Exception) {
-                    Log.e("Login", "エラー: ${e.message}", e)
+                    Log.e("MainActivity", "掲示板作成エラー: ${e.message}", e)
                     withContext(Dispatchers.Main) {
                         Toast.makeText(this@MainActivity, "掲示板作成に失敗しました", Toast.LENGTH_SHORT).show()
                     }
                 }
             }
         }
-
         loginButton.setOnClickListener {
             if (userSession.isLoggedIn()) {
                 userSession.logout()
@@ -147,23 +160,50 @@ class MainActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
+        // ランキング表示
+        binding.rankingRecyclerView.layoutManager = LinearLayoutManager(this)
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val rankings = apiService.getDailyRanking()
+                withContext(Dispatchers.Main) {
+                    val adapter = RankingAdapter(rankings) { board: BoardRanking ->
+                        val intent = Intent(this@MainActivity, BoardActivity::class.java).apply {
+                            putExtra("BOARD_ID", board.board_id.toString())
+                            putExtra("USER_ID", userId)
+                            putExtra("POST_NAME", postNameField.text.toString())
+                        }
+                        startActivity(intent)
+                    }
+                    binding.rankingRecyclerView.adapter = adapter
+                }
+            } catch (e: Exception) {
+                Log.e("MainActivity", "ランキング取得エラー: ${e.message}", e)
+                withContext(Dispatchers.Main) {
+                    Toast.makeText(this@MainActivity, "ランキング取得に失敗しました", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     private fun setClearIconVisible(visible: Boolean) {
         val icon = if (visible) clearIcon else null
-        editTextBoardName.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, icon, null)
+        binding.editTextBoardName.setCompoundDrawablesRelativeWithIntrinsicBounds(null, null, icon, null)
+    }
+
+    private fun updateLoginUI() {
+        if (userSession.isLoggedIn()) {
+            binding.buttonLogin.text = "ログアウト"
+            binding.buttonLogin.visibility = View.VISIBLE
+            binding.headerLayout.visibility = View.VISIBLE
+        } else {
+            binding.buttonLogin.text = "ログイン"
+            binding.buttonLogin.visibility = View.VISIBLE
+            binding.headerLayout.visibility = View.GONE
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        if (userSession.isLoggedIn()) {
-            loginButton.text = "ログアウト"
-            loginButton.visibility = View.VISIBLE
-            headerLayout.visibility = View.VISIBLE
-        } else {
-            loginButton.text = "ログイン"
-            loginButton.visibility = View.VISIBLE
-            headerLayout.visibility = View.GONE
-        }
+        updateLoginUI()
     }
 }

@@ -15,6 +15,8 @@ app.use(cors());
 app.use(bodyParser.json());
 app.use('/auth', authRoutes);
 app.use(express.json());
+const rankingRoutes = require('./routes/ranking');
+app.use('/', rankingRoutes);
 
 const pool = new Pool({
   user: 'postgres',
@@ -110,14 +112,14 @@ app.post('/boards', async (req, res) => {
 
     // 既存掲示板のチェック
     const existing = await pool.query(
-      'SELECT id FROM boards WHERE board_name = $1',
+      'SELECT board_id FROM boards WHERE board_name = $1',
       [board_code]
     );
 
     let boardId;
 
     if (existing.rows.length > 0) {
-      boardId = existing.rows[0].id;
+      boardId = existing.rows[0].board_id;
 
       // アクセス数をインクリメント
       await pool.query(`
@@ -136,10 +138,10 @@ app.post('/boards', async (req, res) => {
     const insertResult = await pool.query(`
       INSERT INTO boards (board_name, is_link, page_title)
       VALUES ($1, $2, $3)
-      RETURNING id
+      RETURNING board_id
     `, [board_code, isLink, pageTitle]);
 
-    boardId = insertResult.rows[0].id;
+    boardId = insertResult.rows[0].board_id;
 
     // boards_access に初期レコード（初回アクセス扱い）
     await pool.query(`
@@ -175,16 +177,16 @@ app.get('/boards/:id', async (req, res) => {
 // 投稿処理
 app.post('/boards/:boardId/posts', async (req, res) => {
   const boardId = req.params.boardId;
-  const { post_name, user_id, content, timestamp } = req.body;
+  const { post_name, user_id, content, created_at } = req.body;
 
-  if (!post_name || !content || !timestamp) {
+  if (!post_name || !content || !created_at) {
     return res.status(400).json({ success: false, message: '必要な情報が不足しています' });
   }
 
   try {
     await pool.query(
-      'INSERT INTO posts (board_id, post_name, user_id, content, timestamp) VALUES ($1, $2, $3, $4, $5)',
-      [boardId, post_name, user_id, content, timestamp]
+      'INSERT INTO posts (board_id, post_name, user_id, content, created_at) VALUES ($1, $2, $3, $4, $5)',
+      [boardId, post_name, user_id, content, created_at]
     );
     res.status(201).json({ success: true, message: '投稿成功' });
   } catch (err) {
@@ -199,7 +201,7 @@ app.get('/posts/:boardId', async (req, res) => {
 
   try {
     const result = await pool.query(
-      'SELECT id, board_id, post_name, content, timestamp FROM posts WHERE board_id = $1 ORDER BY id DESC',
+      'SELECT id, board_id, post_name, content, created_at FROM posts WHERE board_id = $1 ORDER BY id DESC',
       [boardId]
     );
     res.json(result.rows);
@@ -267,7 +269,7 @@ app.get('/bookmarks/:userId', async (req, res) => {
       FROM 
         bookmark b
       JOIN 
-        boards bd ON b.board_id = bd.id
+        boards bd ON b.board_id = bd.board_id
       WHERE 
         b.user_id = $1
       ORDER BY 
@@ -467,7 +469,6 @@ app.post('/auth/google', async (req, res) => {
     res.status(500).json({ success: false, message: err.message });
   }
 });
-
 
 server.listen(port, () => {
   console.log(`🚀 サーバー起動 http://localhost:${port}`);

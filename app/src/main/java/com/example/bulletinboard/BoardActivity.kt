@@ -51,8 +51,8 @@ class BoardActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
-            val post = Post(user_id = userId , post_name = postName, content = content, timestamp = timestamp)
+            val created_at = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
+            val post = Post(user_id = userId , post_name = postName, content = content, created_at = created_at, board_id = boardId)
 
             CoroutineScope(Dispatchers.IO).launch {
                 try {

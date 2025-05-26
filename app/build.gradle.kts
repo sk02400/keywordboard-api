@@ -3,6 +3,7 @@ plugins {
     id("com.google.gms.google-services")
     kotlin("android")
     kotlin("plugin.serialization") // ← ここをKotlinバージョンに合わせる
+    kotlin("kapt")
 }
 
 android {
@@ -62,5 +63,9 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics")
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.android.gms:play-services-auth:21.0.0")
-
+    implementation("androidx.recyclerview:recyclerview:1.3.1")
+    implementation("androidx.cardview:cardview:1.0.0")
+    implementation("io.coil-kt:coil:2.4.0")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    kapt("com.github.bumptech.glide:compiler:4.16.0")
 }
