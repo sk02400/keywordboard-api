@@ -9,10 +9,7 @@ import android.text.TextWatcher
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.ImageButton
-import android.widget.Toast
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -31,8 +28,8 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var userSession: UserSession
-    private lateinit var loginButton: Button
-    private lateinit var headerLayout: View
+    private lateinit var buttonLoginHeader: Button
+    private lateinit var buttonLogoutHeader: Button
     private lateinit var buttonGo: Button
     private lateinit var apiService: ApiService
     private lateinit var editTextBoardName: EditText
@@ -44,13 +41,12 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
         apiService = ApiClient.apiService
         userSession = UserSession(this)
 
         buttonGo = findViewById(R.id.buttonGo)
-        loginButton = findViewById(R.id.buttonLogin)
-        headerLayout = findViewById(R.id.headerLayout)
+        buttonLoginHeader = findViewById(R.id.buttonLoginHeader)
+        buttonLogoutHeader = findViewById(R.id.buttonLogoutHeader)
         val bookmarkButton = findViewById<ImageButton>(R.id.buttonBookmark)
         val messageButton = findViewById<ImageButton>(R.id.buttonMessage)
         val notificationButton = findViewById<ImageButton>(R.id.buttonNotification)
@@ -63,16 +59,15 @@ class MainActivity : AppCompatActivity() {
         val userId = userSession.getLogin()
         val postNameField = binding.editTextName
 
-        // テキスト変更でクリアアイコン表示
         binding.editTextBoardName.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 setClearIconVisible(!s.isNullOrEmpty())
             }
+
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-        // クリアアイコンタップで入力リセット
         binding.editTextBoardName.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_UP) {
                 val drawableEnd = binding.editTextBoardName.compoundDrawablesRelative[2]
@@ -86,21 +81,22 @@ class MainActivity : AppCompatActivity() {
             false
         }
 
-        // ログインUI状態更新
+        // ログイン状態に応じてUIを更新
         updateLoginUI()
 
-        // ログイン・ログアウト切り替え
-        binding.buttonLogin.setOnClickListener {
-            if (userSession.isLoggedIn()) {
-                userSession.logout()
-                updateLoginUI()
-            } else {
-                startActivity(Intent(this, LoginActivity::class.java))
-            }
+        // ログインボタンクリック
+        buttonLoginHeader.setOnClickListener {
+            startActivity(Intent(this, LoginActivity::class.java))
         }
 
-        // 掲示板に移動ボタン
-        binding.buttonGo.setOnClickListener {
+        // ログアウトボタンクリック
+        buttonLogoutHeader.setOnClickListener {
+            userSession.logout()
+            updateLoginUI()
+        }
+
+        // 掲示板に移動
+        buttonGo.setOnClickListener {
             val boardName = binding.editTextBoardName.text.toString()
             val postName = postNameField.text.toString()
 
@@ -129,15 +125,6 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
-        loginButton.setOnClickListener {
-            if (userSession.isLoggedIn()) {
-                userSession.logout()
-                loginButton.text = "ログイン"
-                headerLayout.visibility = View.GONE
-            } else {
-                startActivity(Intent(this, LoginActivity::class.java))
-            }
-        }
 
         bookmarkButton.setOnClickListener {
             val intent = Intent(this, BookmarkActivity::class.java).apply {
@@ -148,9 +135,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         messageButton.setOnClickListener {
-            val intent = Intent(this, MessageListActivity::class.java)
-            intent.putExtra("USER_ID", userId)
-            intent.putExtra("POST_NAME", editTextPostName.text.toString())
+            val intent = Intent(this, MessageListActivity::class.java).apply {
+                putExtra("USER_ID", userId)
+                putExtra("POST_NAME", editTextPostName.text.toString())
+            }
             startActivity(intent)
         }
 
@@ -160,6 +148,7 @@ class MainActivity : AppCompatActivity() {
             }
             startActivity(intent)
         }
+
         // ランキング表示
         binding.rankingRecyclerView.layoutManager = LinearLayoutManager(this)
         CoroutineScope(Dispatchers.IO).launch {
@@ -192,13 +181,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateLoginUI() {
         if (userSession.isLoggedIn()) {
-            binding.buttonLogin.text = "ログアウト"
-            binding.buttonLogin.visibility = View.VISIBLE
-            binding.headerLayout.visibility = View.VISIBLE
+            buttonLoginHeader.visibility = View.GONE
+            buttonLogoutHeader.visibility = View.VISIBLE
         } else {
-            binding.buttonLogin.text = "ログイン"
-            binding.buttonLogin.visibility = View.VISIBLE
-            binding.headerLayout.visibility = View.GONE
+            buttonLoginHeader.visibility = View.VISIBLE
+            buttonLogoutHeader.visibility = View.GONE
         }
     }
 
