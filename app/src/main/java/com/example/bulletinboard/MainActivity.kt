@@ -92,7 +92,12 @@ class MainActivity : AppCompatActivity() {
         // ログアウトボタンクリック
         buttonLogoutHeader.setOnClickListener {
             userSession.logout()
-            updateLoginUI()
+            // ログアウト後はログイン画面に戻る＋バックスタッククリア
+            val intent = Intent(this, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(intent)
+            finish()
         }
 
         // 掲示板に移動
@@ -127,19 +132,28 @@ class MainActivity : AppCompatActivity() {
         }
 
         bookmarkButton.setOnClickListener {
-            val intent = Intent(this, BookmarkActivity::class.java).apply {
-                putExtra("USER_ID", userId)
-                putExtra("POST_NAME", editTextPostName.text.toString())
+            if (userSession.isLoggedIn()) {
+                val intent = Intent(this, BookmarkActivity::class.java).apply {
+                    putExtra("USER_ID", userId)
+                    putExtra("POST_NAME", editTextPostName.text.toString())
+                }
+                startActivity(intent)
+            } else {
+                Toast.makeText(this, "ログインしてください", Toast.LENGTH_SHORT).show()
             }
-            startActivity(intent)
+
         }
 
         messageButton.setOnClickListener {
-            val intent = Intent(this, MessageListActivity::class.java).apply {
-                putExtra("USER_ID", userId)
-                putExtra("POST_NAME", editTextPostName.text.toString())
+            if (userSession.isLoggedIn()) {
+                val intent = Intent(this, MessageListActivity::class.java).apply {
+                    putExtra("USER_ID", userId)
+                    putExtra("POST_NAME", editTextPostName.text.toString())
+                }
+                startActivity(intent)
+            } else {
+                Toast.makeText(this, "ログインしてください", Toast.LENGTH_SHORT).show()
             }
-            startActivity(intent)
         }
 
         notificationButton.setOnClickListener {
