@@ -32,6 +32,7 @@ class BoardActivity : AppCompatActivity() {
         postName = intent.getStringExtra("POST_NAME") ?: "匿名"
         boardId = intent.getStringExtra("BOARD_ID") ?: "default"
 
+        binding.editTextPost.hint = "$postName の投稿"
         // ツールバーセット＆戻るボタン表示
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {

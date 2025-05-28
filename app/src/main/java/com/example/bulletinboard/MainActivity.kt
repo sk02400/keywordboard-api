@@ -57,13 +57,12 @@ class MainActivity : AppCompatActivity() {
         setClearIconVisible(false)
 
         val userId = userSession.getLogin()
-        val postNameField = binding.editTextName
+        //val postNameField = binding.editTextName
 
         binding.editTextBoardName.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 setClearIconVisible(!s.isNullOrEmpty())
             }
-
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
@@ -103,7 +102,7 @@ class MainActivity : AppCompatActivity() {
         // 掲示板に移動
         buttonGo.setOnClickListener {
             val boardName = binding.editTextBoardName.text.toString()
-            val postName = postNameField.text.toString()
+            val postName = getIsBlankPostName()
 
             if (boardName.isBlank()) {
                 Toast.makeText(this, "掲示板名を入力してください", Toast.LENGTH_SHORT).show()
@@ -135,7 +134,7 @@ class MainActivity : AppCompatActivity() {
             if (userSession.isLoggedIn()) {
                 val intent = Intent(this, BookmarkActivity::class.java).apply {
                     putExtra("USER_ID", userId)
-                    putExtra("POST_NAME", editTextPostName.text.toString())
+                    putExtra("POST_NAME", getIsBlankPostName())
                 }
                 startActivity(intent)
             } else {
@@ -148,7 +147,7 @@ class MainActivity : AppCompatActivity() {
             if (userSession.isLoggedIn()) {
                 val intent = Intent(this, MessageListActivity::class.java).apply {
                     putExtra("USER_ID", userId)
-                    putExtra("POST_NAME", editTextPostName.text.toString())
+                    putExtra("POST_NAME", getIsBlankPostName())
                 }
                 startActivity(intent)
             } else {
@@ -173,7 +172,7 @@ class MainActivity : AppCompatActivity() {
                         val intent = Intent(this@MainActivity, BoardActivity::class.java).apply {
                             putExtra("BOARD_ID", board.board_id.toString())
                             putExtra("USER_ID", userId)
-                            putExtra("POST_NAME", postNameField.text.toString())
+                            putExtra("POST_NAME", getIsBlankPostName())
                         }
                         startActivity(intent)
                     }
@@ -186,6 +185,11 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+    private fun getIsBlankPostName(): String {
+        val inputPostName = binding.editTextName.text
+        val postName = if(inputPostName.isNullOrBlank()) "名無しユーザー" else inputPostName.toString()
+        return postName
     }
 
     private fun setClearIconVisible(visible: Boolean) {

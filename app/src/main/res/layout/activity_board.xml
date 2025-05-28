@@ -35,14 +35,14 @@
         <!-- 投稿入力 -->
         <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:hint=""> <!-- hint は空にする -->
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/editTextPost"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:maxLength="1000"
-                android:hint="投稿内容を入力" />
+                android:maxLength="1000" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.button.MaterialButton
