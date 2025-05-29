@@ -4,6 +4,7 @@ plugins {
     kotlin("android")
     kotlin("plugin.serialization") // ← ここをKotlinバージョンに合わせる
     kotlin("kapt")
+    kotlin("plugin.parcelize")
 }
 
 android {

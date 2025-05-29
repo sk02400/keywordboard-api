@@ -106,7 +106,7 @@ class ChatActivity : AppCompatActivity() {
 
             override fun onClosed(webSocket: WebSocket, code: Int, reason: String) {
                 runOnUiThread {
-                    toast("WebSocket切断: $reason")
+                    //toast("WebSocket切断: $reason")
                 }
             }
         })
@@ -126,7 +126,7 @@ class ChatActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        webSocket.close(1000, "Activity終了")
+        // webSocket.close(1000, "Activity終了")
         client.dispatcher.executorService.shutdown() // 🔄 ここに移動
     }
 

@@ -1,13 +1,21 @@
 package com.example.bulletinboard
 
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bulletinboard.databinding.ActivityBoardBinding
+import com.example.bulletinboard.model.Board
+import com.example.bulletinboard.model.BoardRanking
 import com.example.bulletinboard.model.Post
 import com.example.bulletinboard.network.ApiClient
 import kotlinx.coroutines.*
@@ -22,28 +30,40 @@ class BoardActivity : AppCompatActivity() {
     private lateinit var userId: String
     private lateinit var postName: String
     private lateinit var boardId: String
+    private lateinit var pageTitle: String
+//    private lateinit var board: BoardRanking // ← 追加
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityBoardBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Intent から取得
         userId = intent.getStringExtra("USER_ID") ?: "匿名"
         postName = intent.getStringExtra("POST_NAME") ?: "匿名"
         boardId = intent.getStringExtra("BOARD_ID") ?: "default"
+        pageTitle = intent.getStringExtra("PAGE_TITLE") ?: "default"
+//        board = intent.getSerializableExtra("BOARD") as? BoardRanking
+//            ?: throw IllegalStateException("Board情報がありません")
 
         binding.editTextPost.hint = "$postName の投稿"
-        // ツールバーセット＆戻るボタン表示
+
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {
             setDisplayHomeAsUpEnabled(true)
-            setHomeAsUpIndicator(R.drawable.ic_arrow_back) // 戻るアイコンを適宜用意してください
+            setHomeAsUpIndicator(R.drawable.ic_arrow_back)
             title = ""
         }
 
         adapter = PostAdapter(emptyList())
         binding.postRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.postRecyclerView.adapter = adapter
+
+        // ヘッダーにタイトル表示
+        binding.toolbar.title = pageTitle
+        binding.toolbar.setOnClickListener {
+            showBoardInfoDialog()
+        }
 
         binding.buttonPost.setOnClickListener {
             val content = binding.editTextPost.text.toString()
@@ -53,7 +73,7 @@ class BoardActivity : AppCompatActivity() {
             }
 
             val created_at = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
-            val post = Post(user_id = userId , post_name = postName, content = content, created_at = created_at, board_id = boardId)
+            val post = Post(user_id = userId, post_name = postName, content = content, created_at = created_at, board_id = boardId)
 
             CoroutineScope(Dispatchers.IO).launch {
                 try {
@@ -77,7 +97,6 @@ class BoardActivity : AppCompatActivity() {
             }
         }
 
-        // ブックマーク状態チェック
         CoroutineScope(Dispatchers.IO).launch {
             checkBookmarkStatus()
             withContext(Dispatchers.Main) {
@@ -88,18 +107,15 @@ class BoardActivity : AppCompatActivity() {
         loadPosts()
     }
 
-    // メニューをセット
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.board_menu, menu)
         updateBookmarkIcon()
         return true
     }
 
-    // メニューアイテムクリック処理
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
-                // 戻るボタン
                 finish()
                 true
             }
@@ -173,5 +189,36 @@ class BoardActivity : AppCompatActivity() {
                 e.printStackTrace()
             }
         }
+    }
+
+    private fun showBoardInfoDialog() {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_board_info, null)
+        val titleTextView = dialogView.findViewById<TextView>(R.id.titleTextView)
+        val urlTextView = dialogView.findViewById<TextView>(R.id.urlTextView)
+
+        val page_title = intent.getStringExtra("PAGE_TITLE") ?: "default"
+        val test = intent.getStringExtra("IS_LINK")
+        val is_link = intent.getStringExtra("IS_LINK").toBoolean()
+        val board_name = intent.getStringExtra("BOARD_NAME") ?: "default"
+
+         titleTextView.text = page_title
+
+        if (is_link) {
+            urlTextView.apply {
+                text = board_name
+                visibility = View.VISIBLE
+                setOnClickListener {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(board_name))
+                    startActivity(intent)
+                }
+            }
+        } else {
+            urlTextView.visibility = View.GONE
+        }
+
+        AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setPositiveButton("閉じる", null)
+            .show()
     }
 }

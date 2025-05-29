@@ -131,7 +131,12 @@ app.post('/boards', async (req, res) => {
           access_count_month = boards_access.access_count_month + 1
       `, [boardId]);
 
-      return res.json({ board_id: boardId, board_code });
+      return res.json({
+          board_id: boardId,
+          page_title: pageTitle,
+          board_name: board_code,
+          is_link: isLink
+      });
     }
 
     // 新規掲示板の登録
@@ -142,6 +147,7 @@ app.post('/boards', async (req, res) => {
     `, [board_code, isLink, pageTitle]);
 
     boardId = insertResult.rows[0].board_id;
+    pageTitle = insertResult.rows[0].page_title;
 
     // boards_access に初期レコード（初回アクセス扱い）
     await pool.query(`
@@ -149,7 +155,12 @@ app.post('/boards', async (req, res) => {
       VALUES ($1, 1, 1, 1)
     `, [boardId]);
 
-    res.json({ board_id: boardId, board_code });
+    res.json({
+        board_id: boardId,
+        page_title: pageTitle,
+        board_name: board_code,
+        is_link: isLink
+    });
 
   } catch (error) {
     console.error(error);

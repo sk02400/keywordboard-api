@@ -32,6 +32,7 @@ router.get('/boards/ranking/day', async (req, res) => {
       result.push({
         board_id: board.board_id,
         page_title: board.page_title,
+        board_name: board.board_name,
         is_link: board.is_link,
         favicon_url: faviconUrl,
         posts: posts,

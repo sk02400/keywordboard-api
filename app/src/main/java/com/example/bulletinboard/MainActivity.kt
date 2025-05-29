@@ -113,11 +113,18 @@ class MainActivity : AppCompatActivity() {
                 try {
                     val response = apiService.getOrCreateBoard(BoardNameRequest(boardName, userId))
                     val boardId = response.board_id
+                    val boardName = response.board_name
+                    val pageTitle = response.page_title
+                    val isLink = response.is_link
+
                     withContext(Dispatchers.Main) {
                         val intent = Intent(this@MainActivity, BoardActivity::class.java).apply {
                             putExtra("BOARD_ID", boardId.toString())
                             putExtra("USER_ID", userId)
                             putExtra("POST_NAME", postName)
+                            putExtra("BOARD_NAME", boardName)
+                            putExtra("PAGE_TITLE", pageTitle)
+                            putExtra("IS_LINK", isLink)
                         }
                         startActivity(intent)
                     }
@@ -168,10 +175,14 @@ class MainActivity : AppCompatActivity() {
             try {
                 val rankings = apiService.getDailyRanking()
                 withContext(Dispatchers.Main) {
-                    val adapter = RankingAdapter(rankings) { board: BoardRanking ->
+                    val adapter = RankingAdapter(rankings)
+                    { board: BoardRanking ->
                         val intent = Intent(this@MainActivity, BoardActivity::class.java).apply {
-                            putExtra("BOARD_ID", board.board_id.toString())
+                            putExtra("BOARD_ID", board.board_id)
                             putExtra("USER_ID", userId)
+                            putExtra("BOARD_NAME", board.board_name)
+                            putExtra("PAGE_TITLE", board.page_title)
+                            putExtra("IS_LINK", board.is_link.toString())
                             putExtra("POST_NAME", getIsBlankPostName())
                         }
                         startActivity(intent)
