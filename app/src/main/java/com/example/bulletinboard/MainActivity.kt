@@ -124,7 +124,7 @@ class MainActivity : AppCompatActivity() {
                             putExtra("POST_NAME", postName)
                             putExtra("BOARD_NAME", boardName)
                             putExtra("PAGE_TITLE", pageTitle)
-                            putExtra("IS_LINK", isLink)
+                            putExtra("IS_LINK", isLink.toString())
                         }
                         startActivity(intent)
                     }

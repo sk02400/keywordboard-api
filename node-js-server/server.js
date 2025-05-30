@@ -143,7 +143,7 @@ app.post('/boards', async (req, res) => {
     const insertResult = await pool.query(`
       INSERT INTO boards (board_name, is_link, page_title)
       VALUES ($1, $2, $3)
-      RETURNING board_id
+      RETURNING board_id, page_title
     `, [board_code, isLink, pageTitle]);
 
     boardId = insertResult.rows[0].board_id;
@@ -276,7 +276,8 @@ app.get('/bookmarks/:userId', async (req, res) => {
       SELECT 
         b.board_id, 
         bd.board_name,
-        bd.page_title
+        bd.page_title,
+        bd.is_link
       FROM 
         bookmark b
       JOIN 

@@ -65,6 +65,9 @@ class BookmarkActivity : AppCompatActivity() {
                             intent.putExtra("BOARD_ID", bookmark.board_id)
                             intent.putExtra("POST_NAME", postName)
                             intent.putExtra("USER_ID", userId)
+                            intent.putExtra("BOARD_NAME", bookmark.board_code)
+                            intent.putExtra("PAGE_TITLE", bookmark.page_title)
+                            intent.putExtra("IS_LINK", bookmark.is_link.toString())
                             startActivity(intent)
                         }
                     }
