@@ -18,7 +18,7 @@ router.get('/boards/ranking/day', async (req, res) => {
 
     for (const board of rows) {
       const postResult = await pool.query(
-        'SELECT board_id, post_name, content, created_at FROM posts WHERE board_id = $1 ORDER BY created_at DESC LIMIT 2',
+        'SELECT board_id, post_name, content, created_at, post_number FROM posts WHERE board_id = $1 ORDER BY post_number ASC LIMIT 2',
         [board.board_id]
       );
 

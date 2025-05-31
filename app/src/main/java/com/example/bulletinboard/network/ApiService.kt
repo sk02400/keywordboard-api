@@ -18,7 +18,11 @@ interface ApiService {
     suspend fun getOrCreateBoard(@Body request: BoardNameRequest): BoardIdResponse
 
     @GET("posts/{boardId}")
-    suspend fun getPosts(@Path("boardId") boardId: String): Response<List<Post>>
+    suspend fun getPosts(
+        @Path("boardId") boardId: String,
+        @Query("offset") offset: Int,
+        @Query("limit") limit: Int
+    ): Response<List<Post>>
 
     @POST("boards/{boardId}/posts")
     suspend fun createPost(

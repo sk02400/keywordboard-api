@@ -13,9 +13,8 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.bulletinboard.databinding.ActivityBoardBinding
-import com.example.bulletinboard.model.Board
-import com.example.bulletinboard.model.BoardRanking
 import com.example.bulletinboard.model.Post
 import com.example.bulletinboard.network.ApiClient
 import kotlinx.coroutines.*
@@ -31,7 +30,12 @@ class BoardActivity : AppCompatActivity() {
     private lateinit var postName: String
     private lateinit var boardId: String
     private lateinit var pageTitle: String
-//    private lateinit var board: BoardRanking // ← 追加
+
+    private var isLoading = false
+    private var allLoaded = false
+    private var offset = 0
+    private val limit = 50
+    private val posts = mutableListOf<Post>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,8 +47,6 @@ class BoardActivity : AppCompatActivity() {
         postName = intent.getStringExtra("POST_NAME") ?: "匿名"
         boardId = intent.getStringExtra("BOARD_ID") ?: "default"
         pageTitle = intent.getStringExtra("PAGE_TITLE") ?: "default"
-//        board = intent.getSerializableExtra("BOARD") as? BoardRanking
-//            ?: throw IllegalStateException("Board情報がありません")
 
         binding.editTextPost.hint = "$postName の投稿"
 
@@ -55,9 +57,23 @@ class BoardActivity : AppCompatActivity() {
             title = ""
         }
 
-        adapter = PostAdapter(emptyList())
+        adapter = PostAdapter(posts)
         binding.postRecyclerView.layoutManager = LinearLayoutManager(this)
         binding.postRecyclerView.adapter = adapter
+
+        // スクロール監視で追加読み込み
+        binding.postRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val firstVisibleItem = layoutManager.findFirstVisibleItemPosition()
+
+                // 上にスクロールして最上部に達した場合に過去の投稿読み込み
+                if (!isLoading && !allLoaded && firstVisibleItem <= 5) {
+                    loadPosts()
+                }
+            }
+        })
+
 
         // ヘッダーにタイトル表示
         binding.toolbar.title = pageTitle
@@ -73,7 +89,7 @@ class BoardActivity : AppCompatActivity() {
             }
 
             val created_at = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
-            val post = Post(user_id = userId, post_name = postName, content = content, created_at = created_at, board_id = boardId)
+            val post = Post(user_id = userId, post_name = postName, content = content, created_at = created_at, board_id = boardId, post_number = 0)
 
             CoroutineScope(Dispatchers.IO).launch {
                 try {
@@ -81,6 +97,10 @@ class BoardActivity : AppCompatActivity() {
                     withContext(Dispatchers.Main) {
                         if (response.isSuccessful) {
                             binding.editTextPost.text?.clear()
+                            // 投稿追加のためにリセットして再読み込み
+                            offset = 0
+                            allLoaded = false
+                            posts.clear()
                             loadPosts()
                         } else {
                             val errorBodyString = response.errorBody()?.string()
@@ -151,6 +171,10 @@ class BoardActivity : AppCompatActivity() {
                 true
             }
             R.id.action_refresh -> {
+                // リフレッシュ時はoffsetリセットして全件再取得
+                offset = 0
+                allLoaded = false
+                posts.clear()
                 loadPosts()
                 Toast.makeText(this, "更新しました", Toast.LENGTH_SHORT).show()
                 true
@@ -176,17 +200,41 @@ class BoardActivity : AppCompatActivity() {
     }
 
     private fun loadPosts() {
+        if (isLoading || allLoaded) return
+        isLoading = true
+
         CoroutineScope(Dispatchers.IO).launch {
             try {
-                val response = api.getPosts(boardId)
+                val response = api.getPosts(boardId, offset, limit)
                 if (response.isSuccessful) {
-                    val posts = response.body() ?: emptyList()
+                    val newPosts = response.body() ?: emptyList()
                     withContext(Dispatchers.Main) {
-                        adapter.update(posts)
+                        if (offset == 0) {
+                            // 初回読み込み時（最新50件）
+                            posts.clear()
+                            posts.addAll(newPosts)
+                            adapter.update(posts)
+                            binding.postRecyclerView.scrollToPosition(posts.size - 1)
+                        } else {
+                            // 過去分追加（上に追加）
+                            val oldSize = posts.size
+                            posts.addAll(0, newPosts)
+                            adapter.update(posts)
+
+                            // 追加後のスクロール位置調整
+                            binding.postRecyclerView.scrollToPosition(newPosts.size)
+                        }
+
+                        if (newPosts.size < limit) {
+                            allLoaded = true
+                        }
+                        offset += newPosts.size
                     }
                 }
             } catch (e: Exception) {
                 e.printStackTrace()
+            } finally {
+                isLoading = false
             }
         }
     }
@@ -197,11 +245,10 @@ class BoardActivity : AppCompatActivity() {
         val urlTextView = dialogView.findViewById<TextView>(R.id.urlTextView)
 
         val page_title = intent.getStringExtra("PAGE_TITLE") ?: "default"
-        val test = intent.getStringExtra("IS_LINK")
         val is_link = intent.getStringExtra("IS_LINK").toBoolean()
         val board_name = intent.getStringExtra("BOARD_NAME") ?: "default"
 
-         titleTextView.text = page_title
+        titleTextView.text = page_title
 
         if (is_link) {
             urlTextView.apply {

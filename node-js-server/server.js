@@ -194,26 +194,57 @@ app.post('/boards/:boardId/posts', async (req, res) => {
     return res.status(400).json({ success: false, message: '必要な情報が不足しています' });
   }
 
+  const client = await pool.connect();
   try {
-    await pool.query(
-      'INSERT INTO posts (board_id, post_name, user_id, content, created_at) VALUES ($1, $2, $3, $4, $5)',
-      [boardId, post_name, user_id, content, created_at]
+    await client.query('BEGIN');
+
+    // 対象掲示板の投稿行をロック付きで取得
+    const result = await client.query(
+      'SELECT post_number FROM posts WHERE board_id = $1 FOR UPDATE',
+      [boardId]
     );
-    res.status(201).json({ success: true, message: '投稿成功' });
+
+    // 最大の post_number を自前で計算
+    const maxPostNumber = result.rows.reduce((max, row) => {
+      return row.post_number > max ? row.post_number : max;
+    }, 0);
+
+    const nextPostNumber = maxPostNumber + 1;
+
+    // 投稿挿入
+    await client.query(
+      `INSERT INTO posts (board_id, post_name, user_id, content, created_at, post_number)
+       VALUES ($1, $2, $3, $4, $5, $6)`,
+      [boardId, post_name, user_id, content, created_at, nextPostNumber]
+    );
+
+    await client.query('COMMIT');
+    res.status(201).json({ success: true, message: '投稿成功', post_number: nextPostNumber });
   } catch (err) {
+    await client.query('ROLLBACK');
     console.error('投稿エラー:', err);
     res.status(500).json({ success: false, message: '投稿に失敗しました' });
+  } finally {
+    client.release();
   }
 });
 
-// 投稿一覧取得処理
+
+
+// 投稿一覧取得処理（limit / offset 対応）
 app.get('/posts/:boardId', async (req, res) => {
   const boardId = req.params.boardId;
+  const limit = parseInt(req.query.limit || 50);
+  const offset = parseInt(req.query.offset || 0);
 
   try {
     const result = await pool.query(
-      'SELECT id, board_id, post_name, content, created_at FROM posts WHERE board_id = $1 ORDER BY id DESC',
-      [boardId]
+      `SELECT id, board_id, post_name, content, created_at, post_number
+       FROM posts
+       WHERE board_id = $1
+       ORDER BY post_number ASC
+       LIMIT $2 OFFSET $3`,
+      [boardId, limit, offset]
     );
     res.json(result.rows);
   } catch (err) {
