@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bulletinboard.adapter.ChatAdapter
 import com.example.bulletinboard.databinding.ActivityChatBinding
 import com.example.bulletinboard.model.Message
+import com.example.bulletinboard.network.ApiClient
 import com.example.bulletinboard.network.ApiService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,7 +44,7 @@ class ChatActivity : AppCompatActivity() {
         supportActionBar?.title = "$partnerId"
 
         api = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:3000/")
+            .baseUrl(ApiClient.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)
@@ -81,7 +82,7 @@ class ChatActivity : AppCompatActivity() {
 
     private fun connectWebSocket() {
         val request = Request.Builder()
-            .url("ws://10.0.2.2:3000/ws/$roomId")
+            .url("ws://keywordboard-api.onrender.com/ws/$roomId")
             .build()
 
         webSocket = client.newWebSocket(request, object : WebSocketListener() {

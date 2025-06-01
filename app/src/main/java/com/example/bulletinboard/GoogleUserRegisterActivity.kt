@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.bulletinboard.databinding.ActivityGoogleUserRegisterBinding
+import com.example.bulletinboard.network.ApiClient
 import com.example.bulletinboard.network.ApiService
 import com.example.bulletinboard.network.RegisterAfterGoogleRequest
 import kotlinx.coroutines.CoroutineScope
@@ -28,7 +29,7 @@ class GoogleUserRegisterActivity : AppCompatActivity() {
         binding.emailTextView.text = email
 
         api = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:3000/")
+            .baseUrl(ApiClient.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)

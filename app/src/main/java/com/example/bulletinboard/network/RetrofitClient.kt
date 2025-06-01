@@ -7,13 +7,13 @@ import retrofit2.create
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 
 object RetrofitClient {
-    private const val BASE_URL = "http://10.0.2.2:3000"
+//    private const val BASE_URL = "http://10.0.2.2:3000"
 
     private val contentType = "application/json".toMediaType()
 
     val instance: ApiService by lazy {
         Retrofit.Builder()
-            .baseUrl(BASE_URL)
+            .baseUrl(ApiClient.BASE_URL)
             .addConverterFactory(Json {
                 ignoreUnknownKeys = true
                 isLenient = true

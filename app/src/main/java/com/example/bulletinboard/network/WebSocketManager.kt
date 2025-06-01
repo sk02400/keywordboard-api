@@ -26,7 +26,7 @@ class WebSocketManager(
 
     fun connect() {
         val request = Request.Builder()
-            .url("ws://10.0.2.2:3000")  // 開発環境に合わせてURL変更
+            .url("wss://keywordboard-api.onrender.com")  // 開発環境に合わせてURL変更
             .build()
 
         webSocket = client.newWebSocket(request, object : WebSocketListener() {

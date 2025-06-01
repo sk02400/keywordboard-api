@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bulletinboard.adapter.BookmarkAdapter
 import com.example.bulletinboard.databinding.ActivityBookmarkBinding
 import com.example.bulletinboard.model.Bookmark
+import com.example.bulletinboard.network.ApiClient
 import com.example.bulletinboard.network.ApiService
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +37,7 @@ class BookmarkActivity : AppCompatActivity() {
         }
 
         apiService = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:3000/")
+            .baseUrl(ApiClient.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)

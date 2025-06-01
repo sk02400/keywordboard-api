@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.bulletinboard.adapter.ChatRoomAdapter
 import com.example.bulletinboard.databinding.ActivityMessageListBinding
 import com.example.bulletinboard.model.ChatRoom
+import com.example.bulletinboard.network.ApiClient
 import com.example.bulletinboard.network.ApiService
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.coroutines.CoroutineScope
@@ -34,7 +35,7 @@ class MessageListActivity : AppCompatActivity() {
         userName = intent.getStringExtra("POST_NAME") ?: ""
 
         api = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:3000/")
+            .baseUrl(ApiClient.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)

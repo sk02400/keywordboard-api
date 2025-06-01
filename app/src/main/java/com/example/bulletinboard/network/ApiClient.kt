@@ -6,7 +6,7 @@ import okhttp3.MediaType.Companion.toMediaType
 import retrofit2.Retrofit
 
 object ApiClient {
-    private const val BASE_URL = "http://10.0.2.2:3000/"
+    const val BASE_URL = "https://keywordboard-api.onrender.com"
 
     private val json = Json {
         ignoreUnknownKeys = true

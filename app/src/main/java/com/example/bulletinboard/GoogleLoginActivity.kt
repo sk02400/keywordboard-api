@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.bulletinboard.databinding.ActivityGoogleLoginBinding
+import com.example.bulletinboard.network.ApiClient
 import com.example.bulletinboard.network.ApiService
 import com.example.bulletinboard.network.RegisterRequest
 import com.google.android.gms.auth.api.signin.GoogleSignIn
@@ -30,7 +31,7 @@ class GoogleLoginActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         api = Retrofit.Builder()
-            .baseUrl("http://10.0.2.2:3000/")
+            .baseUrl(ApiClient.BASE_URL)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
             .create(ApiService::class.java)
